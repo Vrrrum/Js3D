@@ -1,3 +1,6 @@
+const canvas = document.querySelector('#canv');
+const ctx = canvas.getContext('2d')
+
 let Vertex = function(x, y, z) {
     this.x = x;
     this.y = y;
@@ -7,6 +10,12 @@ let Vertex = function(x, y, z) {
 let Vertex2D = function(x, y) {
     this.x = x;
     this.y = y;
+}
+
+let project = function(M) {
+    // console.log(M.x);
+    // console.log(M);
+    return new Vertex2D(M.x, M.z);
 }
 
 let Cube = function(center, size) {
@@ -47,16 +56,32 @@ let Cube = function(center, size) {
     ];
 }
 
-let renderOrt = function(objects, ctx, canvasSize) {
-    canvasRadX = canvasSize/2;
-    canvasRadY = canvasSize/2;
-    
-    for(let i = 0; i < objects.length - 1; i++) {
-        let currentObj = objects[i-1];
+let cube = new Cube(new Vertex(0, 0, 0), 200);
+let objects = [cube];
 
-        for(let j = 0; j < objects[i].faces.length -1; j++) {
-            var face = objects[i].faces[j];
+let renderOrt = function(objects, ctx) {
+    const dx = ctx.canvas.clientWidth / 2;
+    const dy = ctx.canvas.clientHeight / 2;
 
+    for(let i = 0; i < objects.length; i++) {
+        for(let j = 0; j < objects[i].faces.length; j++) {
+            let face = objects[i].faces[j];
+
+            let P = project(face[0]);
+            ctx.beginPath();
+            ctx.moveTo(P.x + dx, -P.y + dy);
+
+            for(let k = 1; k < face.length; k++) {
+                let P = project(face[k]);
+                ctx.lineTo(P.x + dx, -P.y + dy);
+            }
+
+            ctx.closePath();
+            ctx.stroke();
+
+            console.count();
         }
     }
 }
+
+renderOrt(objects, ctx);
